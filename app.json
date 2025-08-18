@@ -1,0 +1,26 @@
+{
+  "name": "CHMPST",
+  "displayName": "CHMPST",
+  "expo": {
+    "name": "CHMPST",
+    "slug": "chmpst",
+    "version": "0.0.1",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTabletMode": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "be79215e-7712-4e57-997d-c550fa9cb1fa"
+      }
+    }
+  }
+}
