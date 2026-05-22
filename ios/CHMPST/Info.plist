@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>CHMPST</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>CHMPST uses the camera to capture photos of basketball player statistics sheets. These photos are analyzed using AI technology to automatically extract player statistics (points, rebounds, assists, steals, blocks, turnovers) and fill in the corresponding data fields in the app. For example, you can take a photo of a game statistics sheet, and the app will automatically identify and extract the relevant player's statistics from the image.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CHMPST accesses your photo library to select images of basketball player statistics sheets. These images are analyzed using AI technology to automatically extract player statistics (points, rebounds, assists, steals, blocks, turnovers) and fill in the corresponding data fields in the app. For example, you can select a photo of a game statistics sheet from your library, and the app will automatically identify and extract the relevant player's statistics from the image.</string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>FamiljenGrotesk-Bold.ttf</string>
+		<string>FamiljenGrotesk-BoldItalic.ttf</string>
+		<string>FamiljenGrotesk-Italic.ttf</string>
+		<string>FamiljenGrotesk-Medium.ttf</string>
+		<string>FamiljenGrotesk-MediumItalic.ttf</string>
+		<string>FamiljenGrotesk-Regular.ttf</string>
+		<string>FamiljenGrotesk-SemiBold.ttf</string>
+		<string>FamiljenGrotesk-SemiBoldItalic.ttf</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+</dict>
+</plist>

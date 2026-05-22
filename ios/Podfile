@@ -1,0 +1,142 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+target 'CHMPST' do
+  # Handle use_native_modules! potentially returning nil
+  begin
+    config = use_native_modules!
+  rescue => e
+    puts "Warning: use_native_modules! failed: #{e.message}"
+    config = {
+      :reactNativePath => "../node_modules/react-native"
+    }
+  end
+  
+  # Fallback if config is nil
+  config ||= {
+    :reactNativePath => "../node_modules/react-native"
+  }
+
+  # Prefer static frameworks for RN pods
+  use_frameworks! :linkage => :static
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+  
+  # Manually link critical native modules
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
+  pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
+  pod 'RNImageCropPicker', :path => '../node_modules/react-native-image-crop-picker'
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+  
+  # React Native Firebase pods
+  pod 'RNFBApp', :path => '../node_modules/@react-native-firebase/app'
+  pod 'RNFBAuth', :path => '../node_modules/@react-native-firebase/auth'
+  pod 'RNFBFirestore', :path => '../node_modules/@react-native-firebase/firestore'
+  pod 'RNFBStorage', :path => '../node_modules/@react-native-firebase/storage'
+end
+
+post_install do |installer|
+  # RN post-install (handle both signatures across RN versions)
+  # Wrap in error handling to gracefully handle missing privacy manifest files
+  begin
+    if method(:react_native_post_install).arity.abs >= 2
+      react_native_post_install(installer, :mac_catalyst_enabled => false)
+    else
+      react_native_post_install(installer, nil, :mac_catalyst_enabled => false)
+    end
+  rescue => e
+    puts "Warning: react_native_post_install failed: #{e.message}"
+    puts "Continuing with build settings configuration..."
+  end
+
+  # Fix script phases to properly handle paths with spaces
+  installer.pods_project.targets.each do |target|
+    target.build_phases.each do |phase|
+      if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+        # Fix script that uses paths with spaces - ensure variables are properly quoted
+        if phase.shell_script && phase.shell_script.include?('WITH_ENVIRONMENT')
+          phase.shell_script = phase.shell_script.gsub(
+            '/bin/sh -c "$WITH_ENVIRONMENT $SCRIPT_PHASES_SCRIPT"',
+            '/bin/sh -c "\"$WITH_ENVIRONMENT\" \"$SCRIPT_PHASES_SCRIPT\""'
+          ).gsub(
+            '/bin/sh -c "$WITH_ENVIRONMENT',
+            '/bin/sh -c "\"$WITH_ENVIRONMENT'
+          )
+        end
+      end
+    end
+  end
+
+  # Apply build settings to all Pod targets
+  installer.pods_project.targets.each do |t|
+    t.build_configurations.each do |cfg|
+      cfg.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] ||= '13.0'
+      cfg.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+      cfg.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
+      
+      # Explicitly remove PassKit from linker flags
+      if cfg.build_settings['OTHER_LDFLAGS']
+        other_ldflags = cfg.build_settings['OTHER_LDFLAGS']
+        if other_ldflags.is_a?(Array)
+          other_ldflags.reject! { |flag| flag.to_s.include?('PassKit') || flag.to_s.include?('passkit') }
+          cfg.build_settings['OTHER_LDFLAGS'] = other_ldflags
+        elsif other_ldflags.is_a?(String)
+          cfg.build_settings['OTHER_LDFLAGS'] = other_ldflags.gsub(/-weak_framework\s+PassKit/i, '').gsub(/-framework\s+PassKit/i, '').strip
+        end
+      end
+    end
+  end
+  
+  # Also remove PassKit from the main project's linker flags
+  installer.pods_project.build_configurations.each do |cfg|
+    if cfg.build_settings['OTHER_LDFLAGS']
+      other_ldflags = cfg.build_settings['OTHER_LDFLAGS']
+      if other_ldflags.is_a?(Array)
+        other_ldflags.reject! { |flag| flag.to_s.include?('PassKit') || flag.to_s.include?('passkit') }
+        cfg.build_settings['OTHER_LDFLAGS'] = other_ldflags
+      elsif other_ldflags.is_a?(String)
+        cfg.build_settings['OTHER_LDFLAGS'] = other_ldflags.gsub(/-weak_framework\s+PassKit/i, '').gsub(/-framework\s+PassKit/i, '').strip
+      end
+    end
+  end
+
+  # fmt 11.0.2 (vendored by React-Core via
+  # node_modules/react-native/third-party-podspecs/fmt.podspec, pinned to
+  # tag 11.0.2) fails to compile under Xcode 26 / Apple Clang 21 with:
+  #   "call to consteval function ... is not a constant expression"
+  # in fmt/format-inl.h. fmt already ships a compiler-version guard that
+  # disables its FMT_USE_CONSTEVAL codepath for Apple Clang < 14 (see
+  # fmt/base.h: `__apple_build_version__ < 14000029L`), because consteval
+  # support was known-broken on old Apple Clang. That guard never
+  # anticipated a *newer* Apple Clang re-triggering the same class of bug
+  # (this is a known upstream fmt issue on very new Clang toolchains).
+  # We route around it the same way fmt does for old compilers: force
+  # FMT_USE_CONSTEVAL to 0, which makes basic_format_string use the
+  # ordinary (non-consteval) detail::check_format_string validation path
+  # instead of the consteval constructor path that's failing to compile.
+  # This only affects compile-time format-string diagnostics (you lose
+  # compile-time argument-count/type checking for fmt calls); it has no
+  # effect on runtime formatting behavior.
+  fmt_base_h = File.join(__dir__, 'Pods', 'fmt', 'include', 'fmt', 'base.h')
+  if File.exist?(fmt_base_h)
+    contents = File.read(fmt_base_h)
+    broken = "#elif defined(__apple_build_version__) && __apple_build_version__ < 14000029L\n#  define FMT_USE_CONSTEVAL 0  // consteval is broken in Apple clang < 14."
+    fixed  = "#elif defined(__apple_build_version__) && __apple_build_version__ < 14000029L\n#  define FMT_USE_CONSTEVAL 0  // consteval is broken in Apple clang < 14.\n#elif defined(__apple_build_version__) && __apple_build_version__ >= 17000000L\n#  define FMT_USE_CONSTEVAL 0  // consteval triggers a compile error on newer Apple Clang (fmt 11.0.2 known issue; must precede the __cpp_consteval check below)"
+    if contents.include?(broken) && !contents.include?('consteval triggers a compile error on newer Apple Clang')
+      contents = contents.sub(broken, fixed)
+      File.write(fmt_base_h, contents)
+      puts "Patched Pods/fmt/include/fmt/base.h: disabled FMT_USE_CONSTEVAL for newer Apple Clang (Xcode 26 fmt 11.0.2 workaround)"
+    end
+  end
+end
+

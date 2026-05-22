@@ -1,0 +1,37 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/FamiljenGrotesk-Bold.ttf",
+      "sha1": "cc0e42c16071720d365d34fced9110e6f2494dc7"
+    },
+    {
+      "path": "assets/fonts/FamiljenGrotesk-BoldItalic.ttf",
+      "sha1": "a633545dc7509285936963e5fdf9df65437c5db5"
+    },
+    {
+      "path": "assets/fonts/FamiljenGrotesk-Italic.ttf",
+      "sha1": "3f91c0729cfef7e6b1d7c859cd35775bbe0f5643"
+    },
+    {
+      "path": "assets/fonts/FamiljenGrotesk-Medium.ttf",
+      "sha1": "c086acd0055d4dcf21a2b598d2b242d9e0549cdd"
+    },
+    {
+      "path": "assets/fonts/FamiljenGrotesk-MediumItalic.ttf",
+      "sha1": "e63b65cf08ad913f84ed08aa315d97739cf17b53"
+    },
+    {
+      "path": "assets/fonts/FamiljenGrotesk-Regular.ttf",
+      "sha1": "28c0b244b82b7faf3c6dae19568198c849686be5"
+    },
+    {
+      "path": "assets/fonts/FamiljenGrotesk-SemiBold.ttf",
+      "sha1": "de7fc04d6b6db91391d4a04c635c1c01a2ed6d7c"
+    },
+    {
+      "path": "assets/fonts/FamiljenGrotesk-SemiBoldItalic.ttf",
+      "sha1": "23283d58022fdb13f67dc1940ffd6ece183095a2"
+    }
+  ]
+}
