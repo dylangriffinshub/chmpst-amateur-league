@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "594148208238",
+    "project_id": "statx-a9bfe",
+    "storage_bucket": "statx-a9bfe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:594148208238:android:f2a6b7fd17caa6e4c4007f",
+        "android_client_info": {
+          "package_name": "com.chmpst.chmpst"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuhpSAmW0yAuHFj57Zwtm26qDFTTyxGMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:594148208238:android:4efd5d1772baa057c4007f",
+        "android_client_info": {
+          "package_name": "com.example.statx"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuhpSAmW0yAuHFj57Zwtm26qDFTTyxGMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
